@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <ctype.h> // isspace
 #include <errno.h>
+#include <math.h>
 
 typedef struct
 {
@@ -14,6 +15,12 @@ typedef struct
 {
     double x, y;
 } xy;
+
+typedef struct
+{
+    double d;
+    int c;
+} dc;
 
 int lineaVacia(const char *s)
 {
@@ -33,6 +40,53 @@ void limpiar_buffer()
     int c;
     while ((c = getchar()) != '\n' && c != EOF)
         ;
+}
+
+double distancias(xy *arrPuntos, xyc *arrClase0, xyc *arrClase1, int linasConDatos, int cantidadPuntos, dc **arrPorPuntos, int cantidadDatosEnClase)
+{
+
+    double distancia0;
+    int a = 0;
+    for (int i = 0; i < cantidadDatosEnClase; i++)
+    {
+        for (int j = 0; j < cantidadPuntos; j++)
+        {
+            double x = arrClase0[i].x - arrPuntos[j].x;
+            double y = arrClase0[i].y - arrPuntos[j].y;
+
+            // printf("%d (%lf, %lf)\n", i, x, y);
+
+            distancia0 = hypot(x, y);
+
+            arrPorPuntos[0][a].d = distancia0;
+            arrPorPuntos[0][a].c = arrClase0[i].c;
+
+            printf("  La distancia entre los puntos (%lf, %lf) y (%lf, %lf) es %lf\n", arrClase0[i].x, arrClase0[i].y, arrPuntos[j].x, arrPuntos[j].y, distancia0);
+            a++;
+        }
+    }
+    printf("%d", a);
+
+    double distancia1;
+    int b = a + 1;
+    for (int i = 0; i < cantidadDatosEnClase; i++)
+    {
+        for (int j = 0; j < cantidadPuntos; j++)
+        {
+            double x = arrClase1[i].x - arrPuntos[j].x;
+            double y = arrClase1[i].y - arrPuntos[j].y;
+
+            // printf("%d (%lf, %lf)\n", i, x, y);
+
+            distancia1 = hypot(x, y);
+
+            arrPorPuntos[1][b].d = distancia1;
+            arrPorPuntos[1][b].c = arrClase0[i].c;
+
+            printf("  La distancia entre los puntos (%lf, %lf) y (%lf, %lf) es %lf\n", arrClase1[i].x, arrClase1[i].y, arrPuntos[j].x, arrPuntos[j].y, distancia1);
+            b++;
+        }
+    }
 }
 
 int main()
@@ -79,7 +133,7 @@ int main()
     {
         if ((fscanf(archivoDatosClases, "%lf %lf %d", &arrClase0[i].x, &arrClase0[i].y, &arrClase0[i].c)) == 3)
         {
-            printf("\t%d \t(%f, %f) \tClase: %d \n", i, arrClase0[i].x, arrClase0[i].y, arrClase0[i].c);
+            // printf("\t%d \t(%f, %f) \tClase: %d \n", i, arrClase0[i].x, arrClase0[i].y, arrClase0[i].c);
         }
     }
 
@@ -91,21 +145,21 @@ int main()
     {
         if ((fscanf(archivoDatosClases, "%lf %lf %d", &arrClase1[i].x, &arrClase1[i].y, &arrClase1[i].c)) == 3)
         {
-            printf("\t%d \t(%f, %f) \tClase: %d \n", i, arrClase1[i].x, arrClase1[i].y, arrClase1[i].c);
+            // printf("\t%d \t(%f, %f) \tClase: %d \n", i, arrClase1[i].x, arrClase1[i].y, arrClase1[i].c);
         }
     }
     fclose(archivoDatosClases);
     //------------------------------------------------------------------------------------------------------------
     int cantidadPuntos;
     printf("\n\tIngrese la cantidad de puntos de las cuales desea conocer su clase\n");
-    scanf("\t%d", &cantidadPuntos);
+    scanf("\t%d", &cantidadPuntos); // Numero de arreglos
 
     xy arrPuntos[cantidadPuntos];
 
     limpiar_buffer();
     char buffer[256];
     char *endptr;
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < cantidadPuntos; i++)
     {
         printf("\n\tPunto: %d\n\tIngrese un numero para x: ", i);
 
@@ -161,4 +215,30 @@ int main()
         // }
         printf("\t(%lf, %lf)\n\n", arrPuntos[i].x, arrPuntos[i].y);
     }
+
+    dc **arrPorPuntos;
+    arrPorPuntos = (dc **)malloc(cantidadPuntos * sizeof(dc *));
+
+    if (arrPorPuntos == NULL)
+    {
+        printf("No se eligió un número de puntos a evaluar");
+        return 1;
+    }
+
+    for (int i = 0; i < cantidadPuntos; i++)
+    {
+        arrPorPuntos[i] = (dc *)malloc(cantidadDatosEnClase * sizeof(dc));
+        if (arrPorPuntos[i] == NULL)
+        {
+            for (int j = 0; j < i; j++)
+            {
+                free(arrPorPuntos[j]);
+            }
+            free(arrPorPuntos);
+            return 1;
+        }
+    }
+    distancias(arrPuntos, arrClase0, arrClase1, linasConDatos, cantidadPuntos, arrPorPuntos, cantidadDatosEnClase);
+
+    free(arrPorPuntos);
 }
