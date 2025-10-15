@@ -45,7 +45,7 @@ void limpiar_buffer()
 double calculoKNN(xy *arrPuntos, xyc *arrClase0, xyc *arrClase1, int linasConDatos, int cantidadPuntos, dc **arrPorPuntos, int cantidadDatosEnClase, xyc *knn)
 {
 
-    printf("\n");
+    // printf("\n\t%d puntos a clasificar según su clase\n\n", cantidadPuntos);
 
     int mitad = linasConDatos / 2;
 
@@ -201,7 +201,7 @@ double ordenadaAlOrigen(double promedioX, double promedioY, double pendiente)
     return b;
 }
 
-double puntoRectaDistancia(double pendiente0, double ordenada0, double pendiente1, double ordenada1, xy *arrPuntos, xyc *arrClase0, xyc *arrClase1, dc **arrPorPuntosMin, xyc *minimoscuadrados, int cantidadPuntos, int linasConDatos)
+double puntoRectaDistancia(double pendiente0, double ordenada0, double pendiente1, double ordenada1, xy *arrPuntos, xyc *arrClase0, xyc *arrClase1, dc **arrPorPuntosMin, xyc *puntoRecta, int cantidadPuntos, int linasConDatos)
 {
     double numerador;
     double denominador;
@@ -274,24 +274,44 @@ double puntoRectaDistancia(double pendiente0, double ordenada0, double pendiente
         }
     }
 
-    printf("\tMínimos cuadrados, clasificación de punto por clase:\n");
+    printf("\tDistancia de un punto a una recta, clasificación de punto por clase:\n");
     int k = 1; // número de vecinos
     for (int i = 0; i < cantidadPuntos; i++)
     {
         for (int j = 0; j < k; j++)
         {
-            minimoscuadrados[i].x = arrPuntos[i].x;
-            minimoscuadrados[i].y = arrPuntos[i].y;
-            minimoscuadrados[i].c = arrPorPuntosMin[i][j].c;
+            puntoRecta[i].x = arrPuntos[i].x;
+            puntoRecta[i].y = arrPuntos[i].y;
+            puntoRecta[i].c = arrPorPuntosMin[i][j].c;
         }
     }
 
     for (int i = 0; i < cantidadPuntos; i++)
     {
-        printf("\tPunto: (%lf, %lf) Clase: %d\n", minimoscuadrados[i].x, minimoscuadrados[i].y, minimoscuadrados[i].c);
+        printf("\tPunto: (%lf, %lf) Clase: %d\n", puntoRecta[i].x, puntoRecta[i].y, puntoRecta[i].c);
     }
 
     return 0.0;
+}
+
+int compararArreglos(xyc *arrComparacion, xyc *arr1, int cantidadPuntos)
+{
+    int correctas = 0;
+    for (int i = 0; i < cantidadPuntos; i++)
+    {
+        if (arrComparacion[i].c == arr1[i].c)
+        {
+            correctas++;
+        }
+    }
+    return correctas;
+}
+
+int accuracy(int correctas, int cantidadPuntos)
+{
+    float a = (float)correctas / cantidadPuntos;
+    float porcentaje = a * 100;
+    return porcentaje;
 }
 
 int main()
@@ -309,7 +329,7 @@ int main()
     for (int i = 0; i < 1; i++) // Cantidad de datos en cada clase
     {
         fscanf(archivoDatosClases, "%d", &cantidadDatosEnClase);
-        printf("\tEvalucaicón de %d coordenadas por cada clase\n\n", cantidadDatosEnClase);
+        printf("\n\tEvalucaicón de %d coordenadas por cada clase (0 y 1)\n\n", cantidadDatosEnClase);
     }
 
     char linea[256];
@@ -323,8 +343,6 @@ int main()
     }
     rewind(archivoDatosClases);
 
-    printf("Cantidad de datos: %d", linasConDatos);
-
     xyc arrClase0[cantidadDatosEnClase];
     xyc arrClase1[cantidadDatosEnClase];
 
@@ -332,77 +350,60 @@ int main()
     sprintf(enteroAcadena, "%d", cantidadDatosEnClase);
     size_t posicionC1 = strlen(enteroAcadena); // Calcular el fin de la primera línea
 
-    printf("\n\tClase 0:\n\n");
+    // printf("\n\tClase 0:\n\n");
     fseek(archivoDatosClases, posicionC1, SEEK_SET);    // Dirigir puntero al inicio de la clase 0
     for (int i = 0; i <= cantidadDatosEnClase - 1; i++) // Guadar los datos en el arr
     {
         if ((fscanf(archivoDatosClases, "%lf %lf %d", &arrClase0[i].x, &arrClase0[i].y, &arrClase0[i].c)) == 3)
         {
-            printf("\t%d \t(%f, %f) \tClase: %d \n", i, arrClase0[i].x, arrClase0[i].y, arrClase0[i].c);
+            // printf("\t%d \t(%f, %f) \tClase: %d \n", i, arrClase0[i].x, arrClase0[i].y, arrClase0[i].c);
         }
     }
 
     long posicionC2 = ftell(archivoDatosClases); // Calcular el fin de la primera clase
-    printf("\n\n\tClase 1:\n\n");
+    // printf("\n\n\tClase 1:\n\n");
 
     fseek(archivoDatosClases, posicionC2, SEEK_SET);    // Dirigir puntero al inicio de la clase 1
     for (int i = 0; i <= cantidadDatosEnClase - 1; i++) // Guadar los datos en el arr
     {
         if ((fscanf(archivoDatosClases, "%lf %lf %d", &arrClase1[i].x, &arrClase1[i].y, &arrClase1[i].c)) == 3)
         {
-            printf("\t%d \t(%f, %f) \tClase: %d \n", i, arrClase1[i].x, arrClase1[i].y, arrClase1[i].c);
+            // printf("\t%d \t(%f, %f) \tClase: %d \n", i, arrClase1[i].x, arrClase1[i].y, arrClase1[i].c);
         }
     }
 
     fclose(archivoDatosClases);
     //------------------------------------------------------------------------------------------
 
-    // printf("\n Clase 0:");
     double promedioX0 = calcularPromedioX(arrClase0, cantidadDatosEnClase);
-    // printf("\nPormedio de x: %lf", promedioX0);
 
     double promedioY0 = calcularPromedioY(arrClase0, cantidadDatosEnClase);
-    // printf("\nPormedio de y: %lf", promedioY0);
 
     double sumaX20 = calcularsumaXX(arrClase0, cantidadDatosEnClase);
-    // printf("\nSuma de x²: %lf", sumaX20);
 
     double sumaXY0 = calcularsumaXY(arrClase0, cantidadDatosEnClase);
-    // printf("\nSuma de xy: %lf", sumaXY0);
 
     double pendiente0 = pendiente(promedioX0, promedioY0, sumaX20, sumaXY0, cantidadDatosEnClase);
-    // printf("\nPendiente: %lf", pendiente0);
 
     double ordenada0 = ordenadaAlOrigen(promedioX0, promedioY0, pendiente0);
-    // printf("\nOrdenada: %lf", ordenada0);
 
     printf("\n\tLínea de ajuste de la clase 0: y=%lf x +%lf\n", pendiente0, ordenada0);
 
-    printf("\tLínea de ajuste de la clase 0: %lfx -y +%lf=0\n", pendiente0, ordenada0);
-
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-    // printf("\n Clase 1:");
     double promedioX1 = calcularPromedioX(arrClase1, cantidadDatosEnClase);
-    // printf("\nPormedio de x: %lf", promedioX1);
 
     double promedioY1 = calcularPromedioY(arrClase1, cantidadDatosEnClase);
-    // printf("\nPormedio de y: %lf", promedioY1);
 
     double sumaX21 = calcularsumaXX(arrClase1, cantidadDatosEnClase);
-    // printf("\nSuma de x²: %lf", sumaX21);
 
     double sumaXY1 = calcularsumaXY(arrClase1, cantidadDatosEnClase);
-    // printf("\nSuma de xy: %lf", sumaXY1);
 
     double pendiente1 = pendiente(promedioX1, promedioY1, sumaX21, sumaXY1, cantidadDatosEnClase);
-    // printf("\nPendiente: %lf", pendiente1);
 
     double ordenada1 = ordenadaAlOrigen(promedioX1, promedioY1, pendiente1);
-    // printf("\nOrdenada: %lf", ordenada1);
 
     printf("\n\tLínea de ajuste de la clase 1: y=%lf x +%lf\n", pendiente1, ordenada1);
-    printf("\tLínea de ajuste de la clase 1: %lfx -y +%lf=0\n", pendiente1, ordenada1);
 
     //------------------------------------------------------------------------------------------------------------
 
@@ -486,12 +487,44 @@ int main()
     }
 
     xyc knn[cantidadPuntos];
-    xyc minimoscuadrados[cantidadPuntos];
+    xyc puntoRecta[cantidadPuntos];
     //----------------------------------------------------------------------------------------------------------------
 
     calculoKNN(arrPuntos, arrClase0, arrClase1, linasConDatos, cantidadPuntos, arrPorPuntos, cantidadDatosEnClase, knn);
-    puntoRectaDistancia(pendiente0, ordenada0, pendiente1, ordenada1, arrPuntos, arrClase0, arrClase1, arrPorPuntosMin, minimoscuadrados, cantidadPuntos, linasConDatos);
+    puntoRectaDistancia(pendiente0, ordenada0, pendiente1, ordenada1, arrPuntos, arrClase0, arrClase1, arrPorPuntosMin, puntoRecta, cantidadPuntos, linasConDatos);
+    //----------------------------------------------------------------------------------------------------------------
 
+    FILE *archivoComparacionClases;
+    archivoComparacionClases = fopen("puntos_ambiguos_prueba.txt", "r");
+
+    if (!archivoComparacionClases) // Mensaje de error al abirir el archivo
+    {
+        printf("El archivo 'puntos_ambiguos_prueba.txt' no existe o la dirección es incorrecta");
+        return 1;
+    }
+
+    xyc arrComparacion[cantidadPuntos];
+    // rewind(archivoComparacionClases);
+
+    for (int i = 0; i <= cantidadPuntos - 1; i++) // Guadar los datos en el arr
+    {
+        (fscanf(archivoComparacionClases, "%lf %lf %d", &arrComparacion[i].x, &arrComparacion[i].y, &arrComparacion[i].c));
+        // printf("\n\n\t%d \t(%f, %f) \tClase: %d \n", i, arrComparacion[i].x, arrComparacion[i].y, arrComparacion[i].c);
+    }
+
+    fclose(archivoComparacionClases);
+    //----------------------------------------------------------------------------------------------------------------
+
+    int knnCorrectas = compararArreglos(arrComparacion, knn, cantidadPuntos);
+    int puntoRectaCorrectas = compararArreglos(arrComparacion, puntoRecta, cantidadPuntos);
+
+    float accuracyKNN = accuracy(knnCorrectas, cantidadPuntos);
+    float accuracyPuntoRecta = accuracy(puntoRectaCorrectas, cantidadPuntos);
+
+    printf("\n\tKNN tiene %d correctas\n\tPunto-Recta tiene %d correctas\n", knnCorrectas, puntoRectaCorrectas);
+    printf("\n\tKNN tiene %.2f %% de Accuracy\n\tPunto-Recta tiene %.2f %% de Accuracy\n", accuracyKNN, accuracyPuntoRecta);
+
+    //----------------------------------------------------------------------------------------------------------------
     free(arrPorPuntos);
     free(arrPorPuntosMin);
 }
