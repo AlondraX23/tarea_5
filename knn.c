@@ -126,41 +126,69 @@ double distancias(xy *arrPuntos, xyc *arrClase0, xyc *arrClase1, int linasConDat
     }
 }
 
-double calcularPromedio(double arr[], int n)
+double calcularPromedioX(xyc *arr, int cantidadDatosEnClase)
 {
     double suma = 0;
     double promedio;
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < cantidadDatosEnClase; i++)
     {
-        suma += arr[i];
+        suma += arr[i].x;
     }
 
-    promedio = (double)suma / n;
+    promedio = (double)suma / cantidadDatosEnClase;
     return promedio;
 }
 
-double calcularsuma(double arr[], int n)
+double calcularPromedioY(xyc *arr, int cantidadDatosEnClase)
 {
     double suma = 0;
+    double promedio;
+
+    for (int i = 0; i < cantidadDatosEnClase; i++)
+    {
+        suma += arr[i].y;
+    }
+
+    promedio = (double)suma / cantidadDatosEnClase;
+    return promedio;
+}
+
+// double calcularsuma(double arr[], int n)
+// {
+//     double suma = 0;
+
+//     for (int i = 0; i < n; i++)
+//     {
+//         suma += arr[i];
+//     }
+
+//     return suma;
+//}
+
+double calcularsumaXX(xyc arr[], int n)
+{
+    double suma = 0;
+    // double sumaX = 0;
+    // double sumaY = 0;
 
     for (int i = 0; i < n; i++)
     {
-        suma += arr[i];
+        suma += arr[i].x * arr[i].x;
     }
 
     return suma;
 }
 
-double calcularsuma00(double arr[], double array[], int n)
+double calcularsumaXY(xyc arr[], int n)
 {
     double suma = 0;
-    double sumaX = 0;
-    double sumaY = 0;
+    // double sumaX = 0;
+    // double sumaY = 0;
 
     for (int i = 0; i < n; i++)
     {
-        suma += arr[i] * array[i];
+        suma += arr[i].x * arr[i].y;
     }
 
     return suma;
@@ -184,6 +212,17 @@ double ordenadaAlOrigen(double promedioX, double promedioY, double pendiente)
     double b = promedioY - (pendiente * promedioX);
     return b;
 }
+
+// double puntoRectaDistancia(double pendiente, double ordenada, xy *arrPuntos, xyc *arrClase0, xyc *arrClase1)
+// {
+//     double numerador;
+//     double denominador;
+//     double distancia;
+//     double B = -1;
+
+//     numerador = fabs(pendiente * arr[i] + B * array[i] + ordenada);
+//     denominador = sqrt(pendiente * pendiente + B * B);
+// }
 
 int main()
 {
@@ -219,10 +258,14 @@ int main()
 
     xyc arrClase0[cantidadDatosEnClase];
     xyc arrClase1[cantidadDatosEnClase];
-    double x0[linasConDatos];
-    double y0[linasConDatos];
-    double x1[linasConDatos];
-    double y1[linasConDatos];
+
+    // double x0[linasConDatos];
+    // double y0[linasConDatos];
+    // double c0[linasConDatos];
+
+    // double x1[linasConDatos];
+    // double y1[linasConDatos];
+    // double c1[linasConDatos];
 
     char enteroAcadena[256];
     sprintf(enteroAcadena, "%d", cantidadDatosEnClase);
@@ -252,43 +295,43 @@ int main()
 
     //----------------------------------------------------------------------------------------
 
-    double temporal = 0;
-    // int d = 0;
-    fseek(archivoDatosClases, posicionC1, SEEK_SET);    // Dirigir puntero al inicio de la clase 0
-    for (int i = 0; i <= cantidadDatosEnClase - 1; i++) // Guadar los datos en el arr
-    {
-        if ((fscanf(archivoDatosClases, "%lf %lf %lf", &x0[i], &y0[i], &temporal)) == 3)
-        {
-            // printf("\t\t%d x: (%f)\ty:(%lf)\n", i, x0[i], y0[i]);
-        }
-        // d++;
-    }
+    // double temporal = 0;
+    // // int d = 0;
+    // fseek(archivoDatosClases, posicionC1, SEEK_SET);    // Dirigir puntero al inicio de la clase 0
+    // for (int i = 0; i <= cantidadDatosEnClase - 1; i++) // Guadar los datos en el arr
+    // {
+    //     if ((fscanf(archivoDatosClases, "%lf %lf %lf", &x0[i], &y0[i], &c0)) == 3)
+    //     {
+    //         // printf("\t\t%d x: (%f)\ty:(%lf)\n", i, x0[i], y0[i]);
+    //     }
+    //     // d++;
+    // }
 
-    fseek(archivoDatosClases, posicionC2, SEEK_SET);    // Dirigir puntero al inicio de la clase 1
-    for (int i = 0; i <= cantidadDatosEnClase - 1; i++) // Guadar los datos en el arr
-    {
-        // printf("%d", d);
-        if ((fscanf(archivoDatosClases, "%lf %lf %lf", &x1[i], &y1[i], &temporal)) == 3)
-        {
-            // printf("\t\t%d x: (%f)\ty:(%lf)\n", i, x1[i], y1[i]);
-        }
-        // d++;
-    }
+    // fseek(archivoDatosClases, posicionC2, SEEK_SET);    // Dirigir puntero al inicio de la clase 1
+    // for (int i = 0; i <= cantidadDatosEnClase - 1; i++) // Guadar los datos en el arr
+    // {
+    //     // printf("%d", d);
+    //     if ((fscanf(archivoDatosClases, "%lf %lf %lf", &x1[i], &y1[i], &c1)) == 3)
+    //     {
+    //         // printf("\t\t%d x: (%f)\ty:(%lf)\n", i, x1[i], y1[i]);
+    //     }
+    //     // d++;
+    // }
 
     fclose(archivoDatosClases);
     //------------------------------------------------------------------------------------------
 
     // printf("\n Clase 0:");
-    double promedioX0 = calcularPromedio(x0, cantidadDatosEnClase);
+    double promedioX0 = calcularPromedioX(arrClase0, cantidadDatosEnClase);
     // printf("\nPormedio de x: %lf", promedioX0);
 
-    double promedioY0 = calcularPromedio(y0, cantidadDatosEnClase);
+    double promedioY0 = calcularPromedioY(arrClase0, cantidadDatosEnClase);
     // printf("\nPormedio de y: %lf", promedioY0);
 
-    double sumaX20 = calcularsuma00(x0, x0, cantidadDatosEnClase);
+    double sumaX20 = calcularsumaXX(arrClase0, cantidadDatosEnClase);
     // printf("\nSuma de x²: %lf", sumaX20);
 
-    double sumaXY0 = calcularsuma00(x0, y0, cantidadDatosEnClase);
+    double sumaXY0 = calcularsumaXY(arrClase0, cantidadDatosEnClase);
     // printf("\nSuma de xy: %lf", sumaXY0);
 
     double pendiente0 = pendiente(promedioX0, promedioY0, sumaX20, sumaXY0, cantidadDatosEnClase);
@@ -299,19 +342,21 @@ int main()
 
     printf("\n\tLínea de ajuste de la clase 0: y=%lf x +%lf\n", pendiente0, ordenada0);
 
+    printf("\tLínea de ajuste de la clase 0: %lfx -y +%lf=0\n", pendiente0, ordenada0);
+
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     // printf("\n Clase 1:");
-    double promedioX1 = calcularPromedio(x1, cantidadDatosEnClase);
+    double promedioX1 = calcularPromedioX(arrClase1, cantidadDatosEnClase);
     // printf("\nPormedio de x: %lf", promedioX1);
 
-    double promedioY1 = calcularPromedio(y1, cantidadDatosEnClase);
+    double promedioY1 = calcularPromedioY(arrClase1, cantidadDatosEnClase);
     // printf("\nPormedio de y: %lf", promedioY1);
 
-    double sumaX21 = calcularsuma00(x1, x1, cantidadDatosEnClase);
+    double sumaX21 = calcularsumaXX(arrClase1, cantidadDatosEnClase);
     // printf("\nSuma de x²: %lf", sumaX21);
 
-    double sumaXY1 = calcularsuma00(x1, y1, cantidadDatosEnClase);
+    double sumaXY1 = calcularsumaXY(arrClase1, cantidadDatosEnClase);
     // printf("\nSuma de xy: %lf", sumaXY1);
 
     double pendiente1 = pendiente(promedioX1, promedioY1, sumaX21, sumaXY1, cantidadDatosEnClase);
@@ -321,6 +366,7 @@ int main()
     // printf("\nOrdenada: %lf", ordenada1);
 
     printf("\n\tLínea de ajuste de la clase 1: y=%lf x +%lf\n", pendiente1, ordenada1);
+    printf("\tLínea de ajuste de la clase 1: %lfx -y +%lf=0\n", pendiente1, ordenada1);
 
     //------------------------------------------------------------------------------------------------------------
 
@@ -379,6 +425,7 @@ int main()
     }
 
     xyc knn[cantidadPuntos];
+    xyc minimoscuadrados[cantidadPuntos];
     //----------------------------------------------------------------------------------------------------------------
 
     distancias(arrPuntos, arrClase0, arrClase1, linasConDatos, cantidadPuntos, arrPorPuntos, cantidadDatosEnClase, knn);
