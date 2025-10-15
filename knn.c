@@ -42,7 +42,7 @@ void limpiar_buffer()
         ;
 }
 
-double distancias(xy *arrPuntos, xyc *arrClase0, xyc *arrClase1, int linasConDatos, int cantidadPuntos, dc **arrPorPuntos, int cantidadDatosEnClase, xyc *knn)
+double calculoKNN(xy *arrPuntos, xyc *arrClase0, xyc *arrClase1, int linasConDatos, int cantidadPuntos, dc **arrPorPuntos, int cantidadDatosEnClase, xyc *knn)
 {
 
     printf("\n");
@@ -154,19 +154,7 @@ double calcularPromedioY(xyc *arr, int cantidadDatosEnClase)
     return promedio;
 }
 
-// double calcularsuma(double arr[], int n)
-// {
-//     double suma = 0;
-
-//     for (int i = 0; i < n; i++)
-//     {
-//         suma += arr[i];
-//     }
-
-//     return suma;
-//}
-
-double calcularsumaXX(xyc arr[], int n)
+double calcularsumaXX(xyc *arr, int n)
 {
     double suma = 0;
     // double sumaX = 0;
@@ -180,7 +168,7 @@ double calcularsumaXX(xyc arr[], int n)
     return suma;
 }
 
-double calcularsumaXY(xyc arr[], int n)
+double calcularsumaXY(xyc *arr, int n)
 {
     double suma = 0;
     // double sumaX = 0;
@@ -213,16 +201,98 @@ double ordenadaAlOrigen(double promedioX, double promedioY, double pendiente)
     return b;
 }
 
-// double puntoRectaDistancia(double pendiente, double ordenada, xy *arrPuntos, xyc *arrClase0, xyc *arrClase1)
-// {
-//     double numerador;
-//     double denominador;
-//     double distancia;
-//     double B = -1;
+double puntoRectaDistancia(double pendiente0, double ordenada0, double pendiente1, double ordenada1, xy *arrPuntos, xyc *arrClase0, xyc *arrClase1, dc **arrPorPuntosMin, xyc *minimoscuadrados, int cantidadPuntos, int linasConDatos)
+{
+    double numerador;
+    double denominador;
+    double distancia;
+    double B = -1;
 
-//     numerador = fabs(pendiente * arr[i] + B * array[i] + ordenada);
-//     denominador = sqrt(pendiente * pendiente + B * B);
-// }
+    printf("\n");
+
+    int mitad = linasConDatos / 2;
+
+    int a = 0;
+    for (int i = 0; i < mitad; i++) // CLASE 0
+    {
+        for (int j = 0; j < cantidadPuntos; j++)
+        {
+            numerador = fabs(pendiente0 * arrClase0[i].x + B * arrClase0[i].y + ordenada0);
+            denominador = sqrt(pendiente0 * pendiente0 + B * B);
+            if (denominador == 0.0)
+            {
+                return -1.0;
+            }
+            distancia = numerador / denominador;
+
+            arrPorPuntosMin[j][i].d = distancia;
+            arrPorPuntosMin[j][i].c = arrClase0[i].c;
+
+            // printf("(%lf, %lf) y (%lf, %lf): (%lf, %d)\n", arrClase0[i].x, arrClase0[i].y, arrPuntos[j].x, arrPuntos[j].y, arrPorPuntos[j][i].d, arrPorPuntos[j][i].c);
+        }
+        a++;
+    }
+
+    int b = -1;
+    for (int i = mitad; i < linasConDatos; i++) // CLASE 1
+    {
+        b++;
+        for (int j = 0; j < cantidadPuntos; j++)
+        {
+            numerador = fabs(pendiente1 * arrClase0[i].x + B * arrClase0[i].y + ordenada1);
+            denominador = sqrt(pendiente1 * pendiente1 + B * B);
+            if (denominador == 0.0)
+            {
+                return -1.0;
+            }
+            distancia = numerador / denominador;
+
+            arrPorPuntosMin[j][i].d = distancia;
+            arrPorPuntosMin[j][i].c = 1;
+
+            // printf("(%lf, %lf) y (%lf, %lf): (%lf, %d)\n", arrClase1[b].x, arrClase1[b].y, arrPuntos[j].x, arrPuntos[j].y, arrPorPuntos[j][i].d, arrPorPuntos[j][i].c);
+        }
+        a++;
+    }
+
+    printf("\n");
+
+    // Ordenar cada fila de arrPorPuntos por distancia (d), de menor a mayor
+    for (int i = 0; i < cantidadPuntos; i++)
+    {
+        for (int j = 0; j < linasConDatos - 1; j++)
+        {
+            for (int k = 0; k < linasConDatos - j - 1; k++)
+            {
+                if (arrPorPuntosMin[i][k].d > arrPorPuntosMin[i][k + 1].d)
+                {
+                    // Intercambiar toda la estructura dc, no solo el valor de d
+                    dc temp = arrPorPuntosMin[i][k];
+                    arrPorPuntosMin[i][k] = arrPorPuntosMin[i][k + 1];
+                    arrPorPuntosMin[i][k + 1] = temp;
+                }
+            }
+        }
+    }
+
+    printf("\tKNN, clasificación de punto por clase:\n");
+    int k = 1; // número de vecinos
+    for (int i = 0; i < cantidadPuntos; i++)
+    {
+        // printf("\nPunto %d - %d vecinos más cercanos:\n", i, k);
+        for (int j = 0; j < k; j++)
+        {
+            // printf("\tPunto: (%lf, %lf) Clase: %d\n", arrPuntos[i].x, arrPuntos[i].y, arrPorPuntos[i][j].c);
+            minimoscuadrados[i].x = arrPuntos[i].x;
+            minimoscuadrados[i].y = arrPuntos[i].y;
+            minimoscuadrados[i].c = arrPorPuntosMin[i][j].c;
+        }
+    }
+    for (int i = 0; i < cantidadPuntos; i++)
+    {
+        printf("\tPunto: (%lf, %lf) Clase: %d\n", minimoscuadrados[i].x, minimoscuadrados[i].y, minimoscuadrados[i].c);
+    }
+}
 
 int main()
 {
@@ -254,18 +324,9 @@ int main()
     rewind(archivoDatosClases);
 
     printf("Cantidad de datos: %d", linasConDatos);
-    // int numeroDeClases = linasConDatos / cantidadDatosEnClase; // Cantidad de arreglos, si se esperan más de dos clases
 
     xyc arrClase0[cantidadDatosEnClase];
     xyc arrClase1[cantidadDatosEnClase];
-
-    // double x0[linasConDatos];
-    // double y0[linasConDatos];
-    // double c0[linasConDatos];
-
-    // double x1[linasConDatos];
-    // double y1[linasConDatos];
-    // double c1[linasConDatos];
 
     char enteroAcadena[256];
     sprintf(enteroAcadena, "%d", cantidadDatosEnClase);
@@ -292,31 +353,6 @@ int main()
             printf("\t%d \t(%f, %f) \tClase: %d \n", i, arrClase1[i].x, arrClase1[i].y, arrClase1[i].c);
         }
     }
-
-    //----------------------------------------------------------------------------------------
-
-    // double temporal = 0;
-    // // int d = 0;
-    // fseek(archivoDatosClases, posicionC1, SEEK_SET);    // Dirigir puntero al inicio de la clase 0
-    // for (int i = 0; i <= cantidadDatosEnClase - 1; i++) // Guadar los datos en el arr
-    // {
-    //     if ((fscanf(archivoDatosClases, "%lf %lf %lf", &x0[i], &y0[i], &c0)) == 3)
-    //     {
-    //         // printf("\t\t%d x: (%f)\ty:(%lf)\n", i, x0[i], y0[i]);
-    //     }
-    //     // d++;
-    // }
-
-    // fseek(archivoDatosClases, posicionC2, SEEK_SET);    // Dirigir puntero al inicio de la clase 1
-    // for (int i = 0; i <= cantidadDatosEnClase - 1; i++) // Guadar los datos en el arr
-    // {
-    //     // printf("%d", d);
-    //     if ((fscanf(archivoDatosClases, "%lf %lf %lf", &x1[i], &y1[i], &c1)) == 3)
-    //     {
-    //         // printf("\t\t%d x: (%f)\ty:(%lf)\n", i, x1[i], y1[i]);
-    //     }
-    //     // d++;
-    // }
 
     fclose(archivoDatosClases);
     //------------------------------------------------------------------------------------------
@@ -424,11 +460,38 @@ int main()
         }
     }
 
+    //------------------------------------------------------------------------------------
+
+    dc **arrPorPuntosMin;
+    arrPorPuntosMin = (dc **)malloc(cantidadPuntos * sizeof(dc *));
+
+    if (arrPorPuntosMin == NULL)
+    {
+        printf("No se eligió un número de puntos a evaluar");
+        return 1;
+    }
+
+    for (int i = 0; i < cantidadPuntos; i++)
+    {
+        arrPorPuntosMin[i] = (dc *)malloc(linasConDatos * sizeof(dc));
+        if (arrPorPuntosMin[i] == NULL)
+        {
+            for (int j = 0; j < i; j++)
+            {
+                free(arrPorPuntosMin[j]);
+            }
+            free(arrPorPuntosMin);
+            return 1;
+        }
+    }
+
     xyc knn[cantidadPuntos];
     xyc minimoscuadrados[cantidadPuntos];
     //----------------------------------------------------------------------------------------------------------------
 
-    distancias(arrPuntos, arrClase0, arrClase1, linasConDatos, cantidadPuntos, arrPorPuntos, cantidadDatosEnClase, knn);
+    calculoKNN(arrPuntos, arrClase0, arrClase1, linasConDatos, cantidadPuntos, arrPorPuntos, cantidadDatosEnClase, knn);
+    puntoRectaDistancia(pendiente0, ordenada0, pendiente1, ordenada1, arrPuntos, arrClase0, arrClase1, arrPorPuntosMin, minimoscuadrados, cantidadPuntos, linasConDatos);
 
     free(arrPorPuntos);
+    free(arrPorPuntosMin);
 }
