@@ -228,7 +228,7 @@ double puntoRectaDistancia(double pendiente0, double ordenada0, double pendiente
             arrPorPuntosMin[j][i].d = distancia;
             arrPorPuntosMin[j][i].c = arrClase0[i].c;
 
-            // printf("(%lf, %lf) y (%lf, %lf): (%lf, %d)\n", arrClase0[i].x, arrClase0[i].y, arrPuntos[j].x, arrPuntos[j].y, arrPorPuntos[j][i].d, arrPorPuntos[j][i].c);
+            printf("(%lf, %lf) y (%lf, %lf): (%lf, %d)\n", arrClase0[i].x, arrClase0[i].y, arrPuntos[j].x, arrPuntos[j].y, arrPorPuntosMin[j][i].d, arrPorPuntosMin[j][i].c);
         }
         a++;
     }
@@ -250,7 +250,7 @@ double puntoRectaDistancia(double pendiente0, double ordenada0, double pendiente
             arrPorPuntosMin[j][i].d = distancia;
             arrPorPuntosMin[j][i].c = 1;
 
-            // printf("(%lf, %lf) y (%lf, %lf): (%lf, %d)\n", arrClase1[b].x, arrClase1[b].y, arrPuntos[j].x, arrPuntos[j].y, arrPorPuntos[j][i].d, arrPorPuntos[j][i].c);
+            printf("(%lf, %lf) y (%lf, %lf): (%lf, %d)\n", arrClase1[b].x, arrClase1[b].y, arrPuntos[j].x, arrPuntos[j].y, arrPorPuntosMin[j][i].d, arrPorPuntosMin[j][i].c);
         }
         a++;
     }
@@ -258,40 +258,40 @@ double puntoRectaDistancia(double pendiente0, double ordenada0, double pendiente
     printf("\n");
 
     // Ordenar cada fila de arrPorPuntos por distancia (d), de menor a mayor
-    for (int i = 0; i < cantidadPuntos; i++)
-    {
-        for (int j = 0; j < linasConDatos - 1; j++)
-        {
-            for (int k = 0; k < linasConDatos - j - 1; k++)
-            {
-                if (arrPorPuntosMin[i][k].d > arrPorPuntosMin[i][k + 1].d)
-                {
-                    // Intercambiar toda la estructura dc, no solo el valor de d
-                    dc temp = arrPorPuntosMin[i][k];
-                    arrPorPuntosMin[i][k] = arrPorPuntosMin[i][k + 1];
-                    arrPorPuntosMin[i][k + 1] = temp;
-                }
-            }
-        }
-    }
+    // for (int i = 0; i < cantidadPuntos; i++)
+    // {
+    //     for (int j = 0; j < linasConDatos - 1; j++)
+    //     {
+    //         for (int k = 0; k < linasConDatos - j - 1; k++)
+    //         {
+    //             if (arrPorPuntosMin[i][k].d > arrPorPuntosMin[i][k + 1].d)
+    //             {
+    //                 // Intercambiar toda la estructura dc, no solo el valor de d
+    //                 dc temp = arrPorPuntosMin[i][k];
+    //                 arrPorPuntosMin[i][k] = arrPorPuntosMin[i][k + 1];
+    //                 arrPorPuntosMin[i][k + 1] = temp;
+    //             }
+    //         }
+    //     }
+    // }
 
-    printf("\tKNN, clasificación de punto por clase:\n");
-    int k = 1; // número de vecinos
-    for (int i = 0; i < cantidadPuntos; i++)
-    {
-        // printf("\nPunto %d - %d vecinos más cercanos:\n", i, k);
-        for (int j = 0; j < k; j++)
-        {
-            // printf("\tPunto: (%lf, %lf) Clase: %d\n", arrPuntos[i].x, arrPuntos[i].y, arrPorPuntos[i][j].c);
-            minimoscuadrados[i].x = arrPuntos[i].x;
-            minimoscuadrados[i].y = arrPuntos[i].y;
-            minimoscuadrados[i].c = arrPorPuntosMin[i][j].c;
-        }
-    }
-    for (int i = 0; i < cantidadPuntos; i++)
-    {
-        printf("\tPunto: (%lf, %lf) Clase: %d\n", minimoscuadrados[i].x, minimoscuadrados[i].y, minimoscuadrados[i].c);
-    }
+    // printf("\tMinimos cuadrados, clasificación de punto por clase:\n");
+    // int k = 1; // número de vecinos
+    // for (int i = 0; i < cantidadPuntos; i++)
+    // {
+    //     // printf("\nPunto %d - %d vecinos más cercanos:\n", i, k);
+    //     for (int j = 0; j < k; j++)
+    //     {
+    //         // printf("\tPunto: (%lf, %lf) Clase: %d\n", arrPuntos[i].x, arrPuntos[i].y, arrPorPuntos[i][j].c);
+    //         minimoscuadrados[i].x = arrPuntos[i].x;
+    //         minimoscuadrados[i].y = arrPuntos[i].y;
+    //         minimoscuadrados[i].c = arrPorPuntosMin[i][j].c;
+    //     }
+    // }
+    // for (int i = 0; i < cantidadPuntos; i++)
+    // {
+    //     printf("\tPunto: (%lf, %lf) Clase: %d\n", minimoscuadrados[i].x, minimoscuadrados[i].y, minimoscuadrados[i].c);
+    // }
 }
 
 int main()
@@ -490,7 +490,7 @@ int main()
     //----------------------------------------------------------------------------------------------------------------
 
     calculoKNN(arrPuntos, arrClase0, arrClase1, linasConDatos, cantidadPuntos, arrPorPuntos, cantidadDatosEnClase, knn);
-    puntoRectaDistancia(pendiente0, ordenada0, pendiente1, ordenada1, arrPuntos, arrClase0, arrClase1, arrPorPuntosMin, minimoscuadrados, cantidadPuntos, linasConDatos);
+    // puntoRectaDistancia(pendiente0, ordenada0, pendiente1, ordenada1, arrPuntos, arrClase0, arrClase1, arrPorPuntosMin, minimoscuadrados, cantidadPuntos, linasConDatos);
 
     free(arrPorPuntos);
     free(arrPorPuntosMin);
