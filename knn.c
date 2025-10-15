@@ -45,25 +45,10 @@ void limpiar_buffer()
 double distancias(xy *arrPuntos, xyc *arrClase0, xyc *arrClase1, int linasConDatos, int cantidadPuntos, dc **arrPorPuntos, int cantidadDatosEnClase, dc *knn)
 {
 
-    // for (int i = 0; i < cantidadPuntos; i++)
-    // {
-    //     printf("0(%lf, %lf)\n", arrClase0[i].x, arrClase0[i].y);
-    // }
-
-    // for (int i = 0; i < cantidadPuntos; i++)
-    // {
-    //     printf("1(%lf, %lf)\n", arrClase1[i].x, arrClase1[i].y);
-    // }
-
-    // for (int i = 0; i < cantidadPuntos; i++)
-    // {
-    //     printf("P(%lf, %lf)\n", arrPuntos[i].x, arrPuntos[i].y);
-    // }
-
     int mitad = linasConDatos / 2;
 
     int a = 0;
-    int distancia;
+    double distancia;
     for (int i = 0; i < mitad; i++) // CLASE 0
     {
         for (int j = 0; j < cantidadPuntos; j++)
@@ -75,34 +60,36 @@ double distancias(xy *arrPuntos, xyc *arrClase0, xyc *arrClase1, int linasConDat
 
             arrPorPuntos[j][i].d = distancia;
             arrPorPuntos[j][i].c = arrClase0[i].c;
+
+            printf("(%lf, %lf) y (%lf, %lf): (%lf, %d)\n", arrClase0[i].x, arrClase0[i].y, arrPuntos[j].x, arrPuntos[j].y, arrPorPuntos[j][i].d, arrPorPuntos[j][i].c);
+            distancia = 0;
+            // x = 0;
+            // y = 0;
         }
         a++;
     }
 
+    int b = -1;
     for (int i = mitad; i < linasConDatos; i++) // CLASE 1
     {
+        b++;
         for (int j = 0; j < cantidadPuntos; j++)
         {
-            double x = arrClase1[i].x - arrPuntos[j].x;
-            double y = arrClase1[i].y - arrPuntos[j].y;
+            double x = arrClase1[b].x - arrPuntos[j].x;
+            double y = arrClase1[b].y - arrPuntos[j].y;
 
             distancia = hypot(x, y);
 
             arrPorPuntos[j][i].d = distancia;
             arrPorPuntos[j][i].c = 1;
+
+            printf("(%lf, %lf) y (%lf, %lf): (%lf, %d)\n", arrClase1[b].x, arrClase1[b].y, arrPuntos[j].x, arrPuntos[j].y, arrPorPuntos[j][i].d, arrPorPuntos[j][i].c);
+            distancia = 0;
         }
         a++;
     }
 
-    for (int i = 0; i < cantidadPuntos; i++)
-    {
-        for (int j = 0; j < linasConDatos; j++)
-        {
-            printf("d:(%lf)\n", arrPorPuntos[i][j].d);
-        }
-    }
-
-    double temp;
+    double temp; // intento de arrgloe de menor a mayor
     for (int i = 0; i < cantidadPuntos - 1; i++)
     {
         for (int j = 0; j < linasConDatos - i - 1; j++)
@@ -117,22 +104,19 @@ double distancias(xy *arrPuntos, xyc *arrClase0, xyc *arrClase1, int linasConDat
         printf("\n");
     }
 
-    for (int i = 0; i < cantidadPuntos; i++)
+    for (int i = 0; i < cantidadPuntos; i++) // Impresión de a arrPorPuntos
     {
-        printf("El numero mas pequeño es: %lf\n", arrPorPuntos[1][0].d);
+        for (int j = 0; j < linasConDatos; j++)
+        {
+            printf("\n Distancias arreglo: (%lf, %d)", arrPorPuntos[i][j].d, arrPorPuntos[i][j].c);
+        }
+        printf("\n");
     }
 
-    //-------------------------------------------------------------------
-
-    /*	Para a <- 1 Hasta n-1 Con Paso 1 Hacer
-        Para b <- 1 Hasta n-a Con Paso 1 Hacer
-            Si arr[b] > arr[b+1] Entonces
-                temp <- arr[b]
-                arr[b] <- arr[b+1]
-                arr[b+1] <- temp
-            FinSi
-        FinPara
-    FinPara */
+    for (int i = 0; i < cantidadPuntos; i++)
+    {
+        printf("El numero mas pequeño es: %lf\n", arrPorPuntos[i][0].d);
+    }
 }
 
 int main()
@@ -180,7 +164,7 @@ int main()
     {
         if ((fscanf(archivoDatosClases, "%lf %lf %d", &arrClase0[i].x, &arrClase0[i].y, &arrClase0[i].c)) == 3)
         {
-            // printf("\t%d \t(%f, %f) \tClase: %d \n", i, arrClase0[i].x, arrClase0[i].y, arrClase0[i].c);
+            printf("\t%d \t(%f, %f) \tClase: %d \n", i, arrClase0[i].x, arrClase0[i].y, arrClase0[i].c);
         }
     }
 
@@ -192,7 +176,7 @@ int main()
     {
         if ((fscanf(archivoDatosClases, "%lf %lf %d", &arrClase1[i].x, &arrClase1[i].y, &arrClase1[i].c)) == 3)
         {
-            // printf("\t%d \t(%f, %f) \tClase: %d \n", i, arrClase1[i].x, arrClase1[i].y, arrClase1[i].c);
+            printf("\t%d \t(%f, %f) \tClase: %d \n", i, arrClase1[i].x, arrClase1[i].y, arrClase1[i].c);
         }
     }
     fclose(archivoDatosClases);
@@ -287,12 +271,6 @@ int main()
     }
 
     dc knn[cantidadPuntos];
-
-    // for (int j = 0; j < cantidadPuntos; j++)
-    // {
-    //     printf("(%lf, %lf)\n", arrPuntos[j].x, arrPuntos[j].y);
-    // }
-    // printf("\n");
 
     distancias(arrPuntos, arrClase0, arrClase1, linasConDatos, cantidadPuntos, arrPorPuntos, cantidadDatosEnClase, knn);
 
