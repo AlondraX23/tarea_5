@@ -506,7 +506,7 @@ int main()
     printf("\tKNN, clasificación de punto por clase:\n");
     calculoKNN(arrPuntos, arrClase0, arrClase1, linasConDatos, cantidadPuntos, arrPorPuntos, cantidadDatosEnClase, knn);
     printf("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
-    printf("\n\n\tMinimos cuadrados, clasificación de punto por clase:\n");
+    printf("\n\tDistancia de un punto a la línea de ajuste, clasificación de punto por clase:\n");
     printf("\n\tLínea de ajuste de la clase 0: y=%lf x %lf\n", pendiente0, ordenada0);
     printf("\n\tLínea de ajuste de la clase 1: y=%lf x +%lf\n", pendiente1, ordenada1);
     puntoRectaDistancia(pendiente0, ordenada0, pendiente1, ordenada1, arrPuntos, arrClase0, arrClase1, arrPorPuntosMin, puntoRecta, cantidadPuntos, linasConDatos);
@@ -539,7 +539,7 @@ int main()
 
     printf("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
     printf("\n\tEl método KNN tiene %.2f %% de Accuracy\n", accuracyKNN);
-    printf("\n\tEl método de Minimos cuadrados tiene %.2f %% de Accuracy\n", accuracyPuntoRecta);
+    printf("\n\tEl método de Distancia de un punto a la línea de ajuste tiene %.2f %% de Accuracy\n", accuracyPuntoRecta);
 
     //----------------------------------------------------------------------------------------------------------------
     xy dosPuntos[2];
