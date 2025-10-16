@@ -107,7 +107,6 @@ double calculoKNN(xy *arrPuntos, xyc *arrClase0, xyc *arrClase1, int linasConDat
         }
     }
 
-    printf("\tKNN, clasificación de punto por clase:\n");
     int k = 1; // número de vecinos
     for (int i = 0; i < cantidadPuntos; i++)
     {
@@ -274,7 +273,6 @@ double puntoRectaDistancia(double pendiente0, double ordenada0, double pendiente
         }
     }
 
-    printf("\tMinimos cuadrados, clasificación de punto por clase:\n");
     int k = 1; // número de vecinos
     for (int i = 0; i < cantidadPuntos; i++)
     {
@@ -407,8 +405,6 @@ int main()
 
     double ordenada0 = ordenadaAlOrigen(promedioX0, promedioY0, pendiente0);
 
-    printf("\n\tLínea de ajuste de la clase 0: y=%lf x +%lf\n", pendiente0, ordenada0);
-
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     double promedioX1 = calcularPromedioX(arrClase1, cantidadDatosEnClase);
@@ -422,8 +418,6 @@ int main()
     double pendiente1 = pendiente(promedioX1, promedioY1, sumaX21, sumaXY1, cantidadDatosEnClase);
 
     double ordenada1 = ordenadaAlOrigen(promedioX1, promedioY1, pendiente1);
-
-    printf("\n\tLínea de ajuste de la clase 1: y=%lf x +%lf\n", pendiente1, ordenada1);
 
     //------------------------------------------------------------------------------------------------------------
 
@@ -509,7 +503,12 @@ int main()
     xyc knn[cantidadPuntos];
     xyc puntoRecta[cantidadPuntos];
     //----------------------------------------------------------------------------------------------------------------
+    printf("\tKNN, clasificación de punto por clase:\n");
     calculoKNN(arrPuntos, arrClase0, arrClase1, linasConDatos, cantidadPuntos, arrPorPuntos, cantidadDatosEnClase, knn);
+    printf("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
+    printf("\n\n\tMinimos cuadrados, clasificación de punto por clase:\n");
+    printf("\n\tLínea de ajuste de la clase 0: y=%lf x %lf\n", pendiente0, ordenada0);
+    printf("\n\tLínea de ajuste de la clase 1: y=%lf x +%lf\n", pendiente1, ordenada1);
     puntoRectaDistancia(pendiente0, ordenada0, pendiente1, ordenada1, arrPuntos, arrClase0, arrClase1, arrPorPuntosMin, puntoRecta, cantidadPuntos, linasConDatos);
     //----------------------------------------------------------------------------------------------------------------
 
@@ -538,7 +537,9 @@ int main()
     float accuracyKNN = accuracy(knnCorrectas, cantidadPuntos);
     float accuracyPuntoRecta = accuracy(puntoRectaCorrectas, cantidadPuntos);
 
-    printf("\n\tKNN tiene %.2f %% de Accuracy\n\tPunto-Recta tiene %.2f %% de Accuracy\n", accuracyKNN, accuracyPuntoRecta);
+    printf("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
+    printf("\n\tEl método KNN tiene %.2f %% de Accuracy\n", accuracyKNN);
+    printf("\n\tEl método de Minimos cuadrados tiene %.2f %% de Accuracy\n", accuracyPuntoRecta);
 
     //----------------------------------------------------------------------------------------------------------------
     xy dosPuntos[2];
@@ -547,11 +548,11 @@ int main()
     // limpiar_buffer();
     char buffer[256];
     char *endptr;
-
+    printf("\n\n++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n\n");
     printf("\n\tIngrese los dos puntos de la recta que desea obtener:\n");
     for (int i = 0; i < 2; i++)
     {
-        printf("\n\tPunto: %d\n\tIngrese un numero para x: ", i);
+        printf("\tPunto: %d\n\tIngrese un numero para x: ", i);
 
         if (fgets(buffer, 256, stdin) == NULL)
         {
@@ -600,14 +601,12 @@ int main()
     double A = (dosPuntos[1].y - dosPuntos[0].y) / (dosPuntos[1].x - dosPuntos[0].x); // pendiente
     double C = dosPuntos[0].y - A * dosPuntos[0].x;                                   // ordenada al origen
 
-    printf("\n\tEcuación de la recta:\n");
-    // printf("\tForma punto-pendiente: y - %.2lf = %.2lf(x - %.2lf)\n", dosPuntos[0].y, m, dosPuntos[0].x);
-    printf("\tForma pendiente-intersección: y = %.2lfx + %.2lf\n", A, C);
+    printf("\n\tEcuación de la recta: y = %.2lfx + %.2lf\n", A, C);
 
     printf("\n\n\tIngrese el punto del cual desea conocer su distancia a la recta encontrada\n");
     for (int i = 0; i < 1; i++)
     {
-        printf("\n\tPunto: %d\n\tIngrese un numero para x: ", i);
+        printf("\tPunto: %d\n\tIngrese un numero para x: ", i);
 
         if (fgets(buffer, 256, stdin) == NULL)
         {
@@ -652,11 +651,11 @@ int main()
             printf("Error: No se encontro ningun numero valido al inicio de la cadena.\n");
         }
 
-        printf("\t(%lf, %lf)\n\n", puntoCalcularDistancia[i].x, puntoCalcularDistancia[i].y);
+        printf("\t(%lf, %lf)\n", puntoCalcularDistancia[i].x, puntoCalcularDistancia[i].y);
     }
 
     double distanciaPuntoARecta = puntoRectaDistancia2(A, C, puntoCalcularDistancia);
-    printf("\n\tLa Distancia del punto (%lf, %lf) a la recta y = %.2lfx + %.2lf es: %lf\n", puntoCalcularDistancia[0].x, puntoCalcularDistancia[0].y, A, C, distanciaPuntoARecta);
+    printf("\n\tLa Distancia del punto (%lf, %lf) a la recta y = %.2lfx + %.2lf es: %lf\n\n", puntoCalcularDistancia[0].x, puntoCalcularDistancia[0].y, A, C, distanciaPuntoARecta);
     //---------------------------------------------------------------------------------
     free(arrPorPuntos);
     free(arrPorPuntosMin);

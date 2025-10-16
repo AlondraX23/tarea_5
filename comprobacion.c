@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 #include <string.h> //strlen
 #include <stdlib.h>
 #include <ctype.h> // isspace
@@ -35,12 +38,12 @@ int lineaVacia(const char *s)
     return 1;
 }
 
-void limpiar_buffer()
-{
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF)
-        ;
-}
+// void limpiar_buffer()
+// {
+//     int c;
+//     while ((c = getchar()) != '\n' && c != EOF)
+//         ;
+// }
 
 double calculoKNN(xy *arrPuntos, xyc *arrClase0, xyc *arrClase1, int linasConDatos, int cantidadPuntos, dc **arrPorPuntos, int cantidadDatosEnClase, xyc *knn)
 {
@@ -336,6 +339,139 @@ int accuracy(int correctas, int cantidadPuntos)
 
 int main()
 {
+    int opcion_seleccionada = 0;
+    char buffer[10]; // Buffer para leer la entrada del usuario
+
+    while (1)
+    {
+        printf("\n--- MENU PRINCIPAL ---\n");
+        printf("1. Usar KNN para definir las clases de los puntos \n");
+        printf("2. Distancia de un punto a una recta dada por 2 puntos \n");
+        printf("3. Usar Minimos cuadrados para definir las clases de los puntos \n");
+        printf("4. Salir\n");
+        printf("Seleccione una opcion: ");
+
+        if (fgets(buffer, sizeof(buffer), stdin) == NULL)
+        {
+            printf("Error de lectura. Saliendo...\n");
+            return 1;
+        }
+
+        char *endptr;
+        errno = 0;
+
+        long valor_leido = strtol(buffer, &endptr, 10);
+        opcion_seleccionada = (int)valor_leido;
+
+        if (errno != 0 || endptr == buffer || *endptr != '\n' && *endptr != '\0')
+        {
+            printf("\nEntrada invalida. Ingrese un numero (1-4).\n");
+            limpiar_buffer();
+            continue;
+        }
+
+        // 4. Procesar la opción seleccionada usando switch
+        switch (opcion_seleccionada)
+        {
+        case 1:
+            opcion_1();
+            break;
+        case 2:
+            opcion_2();
+            break;
+        case 3:
+            opcion_3();
+            break;
+        case 4:
+            printf("\nSaliendo del programa\n");
+            return 0;
+        default:
+            printf("\nOpcion no valida. Ingrese 1, 2, 3 o 4.\n");
+            break;
+        }
+    }
+    //--------------------------------------------------------------------------------
+    FILE *archivoDatosClases;
+    archivoDatosClases = fopen("datos_clases.txt", "r");
+
+    if (!archivoDatosClases) // Mensaje de error al abirir el archivo
+    {
+        printf("El archivo 'datos_clases.txt' no existe o la dirección es incorrecta");
+        return 1;
+    }
+
+    int cantidadDatosEnClase;
+    for (int i = 0; i < 1; i++) // Cantidad de datos en cada clase
+    {
+        fscanf(archivoDatosClases, "%d", &cantidadDatosEnClase);
+        printf("\n\tEvalucaicón de %d coordenadas por cada clase (0 y 1)\n\n", cantidadDatosEnClase);
+    }
+
+    char linea[256];
+    int linasConDatos = 0;
+    while (fgets(linea, 256, archivoDatosClases) != NULL) // Cantidad total de datos
+    {
+        if (!lineaVacia(linea))
+        {
+            linasConDatos++;
+        }
+    }
+    fclose(archivoDatosClases);
+    //--------------------------------------------------------------------------------
+    FILE *archivoPuntos;
+    archivoPuntos = fopen("puntos.txt", "r");
+
+    if (!archivoPuntos) // Mensaje de error al abirir el archivo
+    {
+        printf("El archivo 'puntos.txt' no existe o la dirección es incorrecta");
+        return 1;
+    }
+
+    char coordenadas[256];
+    int cantidadPuntos = 0;
+    while (fgets(coordenadas, 256, archivoPuntos) != NULL) // Cantidad total de datos
+    {
+        if (!lineaVacia(coordenadas))
+        {
+            cantidadPuntos++;
+        }
+    }
+    fclose(archivoPuntos);
+
+    return 0;
+}
+
+// Implementación de las funciones de ejemplo
+
+void opcion_1()
+{
+    knn();
+}
+
+void opcion_2()
+{
+    printf("\n>>> Ha seleccionado la Opcion 2. Distancia de un punto a una recta...\n");
+    // Aqui va el codigo de la Opcion 2
+}
+
+void opcion_3()
+{
+    printf("\n>>> Ha seleccionado la Opcion 3. Minimos cuadrados...\n");
+    // Aqui va el codigo de la Opcion 3
+}
+
+// Funcion auxiliar para limpiar el buffer en caso de entradas erroneas con fgets/scanf
+void limpiar_buffer()
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF)
+    {
+        // Descartar caracteres restantes
+    }
+}
+
+void knn()
+{
     FILE *archivoDatosClases;
     archivoDatosClases = fopen("datos_clases.txt", "r");
 
@@ -424,240 +560,4 @@ int main()
     double ordenada1 = ordenadaAlOrigen(promedioX1, promedioY1, pendiente1);
 
     printf("\n\tLínea de ajuste de la clase 1: y=%lf x +%lf\n", pendiente1, ordenada1);
-
-    //------------------------------------------------------------------------------------------------------------
-
-    FILE *archivoPuntos;
-    archivoPuntos = fopen("puntos.txt", "r");
-
-    if (!archivoPuntos) // Mensaje de error al abirir el archivo
-    {
-        printf("El archivo 'puntos.txt' no existe o la dirección es incorrecta");
-        return 1;
-    }
-
-    char coordenadas[256];
-    int cantidadPuntos = 0;
-    while (fgets(coordenadas, 256, archivoPuntos) != NULL) // Cantidad total de datos
-    {
-        if (!lineaVacia(coordenadas))
-        {
-            cantidadPuntos++;
-        }
-    }
-
-    xy arrPuntos[cantidadPuntos];
-
-    rewind(archivoPuntos);
-
-    for (int i = 0; i <= cantidadPuntos; i++) // Guadar los datos en el arr
-    {
-        if ((fscanf(archivoPuntos, "%lf %lf", &arrPuntos[i].x, &arrPuntos[i].y)) == 2)
-        {
-            // printf("\t%d \t(%f, %f) \n", i, arrPuntos[i].x, arrPuntos[i].y);
-        }
-    }
-    //-------------------------------------------------------------------------------------
-    dc **arrPorPuntos;
-    arrPorPuntos = (dc **)malloc(cantidadPuntos * sizeof(dc *));
-
-    if (arrPorPuntos == NULL)
-    {
-        printf("No se eligió un número de puntos a evaluar");
-        return 1;
-    }
-
-    for (int i = 0; i < cantidadPuntos; i++)
-    {
-        arrPorPuntos[i] = (dc *)malloc(linasConDatos * sizeof(dc));
-        if (arrPorPuntos[i] == NULL)
-        {
-            for (int j = 0; j < i; j++)
-            {
-                free(arrPorPuntos[j]);
-            }
-            free(arrPorPuntos);
-            return 1;
-        }
-    }
-
-    //------------------------------------------------------------------------------------
-
-    dc **arrPorPuntosMin;
-    arrPorPuntosMin = (dc **)malloc(cantidadPuntos * sizeof(dc *));
-
-    if (arrPorPuntosMin == NULL)
-    {
-        printf("No se eligió un número de puntos a evaluar");
-        return 1;
-    }
-
-    for (int i = 0; i < cantidadPuntos; i++)
-    {
-        arrPorPuntosMin[i] = (dc *)malloc(linasConDatos * sizeof(dc));
-        if (arrPorPuntosMin[i] == NULL)
-        {
-            for (int j = 0; j < i; j++)
-            {
-                free(arrPorPuntosMin[j]);
-            }
-            free(arrPorPuntosMin);
-            return 1;
-        }
-    }
-    //-------------------------------------------------------------------------------------
-    xyc knn[cantidadPuntos];
-    xyc puntoRecta[cantidadPuntos];
-    //----------------------------------------------------------------------------------------------------------------
-    calculoKNN(arrPuntos, arrClase0, arrClase1, linasConDatos, cantidadPuntos, arrPorPuntos, cantidadDatosEnClase, knn);
-    puntoRectaDistancia(pendiente0, ordenada0, pendiente1, ordenada1, arrPuntos, arrClase0, arrClase1, arrPorPuntosMin, puntoRecta, cantidadPuntos, linasConDatos);
-    //----------------------------------------------------------------------------------------------------------------
-
-    FILE *archivoComparacionClases;
-    archivoComparacionClases = fopen("puntos_ambiguos_prueba.txt", "r");
-
-    if (!archivoComparacionClases) // Mensaje de error al abirir el archivo
-    {
-        printf("El archivo 'puntos_ambiguos_prueba.txt' no existe o la dirección es incorrecta");
-        return 1;
-    }
-
-    xyc arrComparacion[cantidadPuntos];
-
-    for (int i = 0; i <= cantidadPuntos - 1; i++) // Guadar los datos en el arr
-    {
-        (fscanf(archivoComparacionClases, "%lf %lf %d", &arrComparacion[i].x, &arrComparacion[i].y, &arrComparacion[i].c));
-    }
-
-    fclose(archivoComparacionClases);
-    //----------------------------------------------------------------------------------------------------------------
-
-    int knnCorrectas = compararArreglos(arrComparacion, knn, cantidadPuntos);
-    int puntoRectaCorrectas = compararArreglos(arrComparacion, puntoRecta, cantidadPuntos);
-
-    float accuracyKNN = accuracy(knnCorrectas, cantidadPuntos);
-    float accuracyPuntoRecta = accuracy(puntoRectaCorrectas, cantidadPuntos);
-
-    printf("\n\tKNN tiene %.2f %% de Accuracy\n\tPunto-Recta tiene %.2f %% de Accuracy\n", accuracyKNN, accuracyPuntoRecta);
-
-    //----------------------------------------------------------------------------------------------------------------
-    xy dosPuntos[2];
-    xy puntoCalcularDistancia[1];
-
-    // limpiar_buffer();
-    char buffer[256];
-    char *endptr;
-
-    printf("\n\tIngrese los dos puntos de la recta que desea obtener:\n");
-    for (int i = 0; i < 2; i++)
-    {
-        printf("\n\tPunto: %d\n\tIngrese un numero para x: ", i);
-
-        if (fgets(buffer, 256, stdin) == NULL)
-        {
-            printf("Error de lectura.\n");
-            return 1;
-        }
-
-        buffer[strcspn(buffer, "\n")] = '\0';
-
-        errno = 0;
-        dosPuntos[i].x = strtod(buffer, &endptr);
-
-        if ((errno == ERANGE && (dosPuntos[i].x == 0 || dosPuntos[i].x == 256)))
-        {
-            printf("Error: Numero fuera del rango de long.\n");
-        }
-        else if (endptr == buffer)
-        {
-            printf("Error: No se encontro ningun numero valido al inicio de la cadena.\n");
-        }
-        //------------------------------------------
-        printf("\tIngrese un numero para y: ");
-
-        if (fgets(buffer, 256, stdin) == NULL)
-        {
-            printf("Error de lectura.\n");
-            return 1;
-        }
-
-        buffer[strcspn(buffer, "\n")] = '\0';
-
-        errno = 0;
-        dosPuntos[i].y = strtod(buffer, &endptr);
-
-        if ((errno == ERANGE && (dosPuntos[i].y == 0 || dosPuntos[i].y == 256)))
-        {
-            printf("Error: Numero fuera del rango de long.\n");
-        }
-        else if (endptr == buffer)
-        {
-            printf("Error: No se encontro ningun numero valido al inicio de la cadena.\n");
-        }
-        printf("\t(%lf, %lf)\n\n", dosPuntos[i].x, dosPuntos[i].y);
-    }
-
-    double A = (dosPuntos[1].y - dosPuntos[0].y) / (dosPuntos[1].x - dosPuntos[0].x); // pendiente
-    double C = dosPuntos[0].y - A * dosPuntos[0].x;                                   // ordenada al origen
-
-    printf("\n\tEcuación de la recta:\n");
-    // printf("\tForma punto-pendiente: y - %.2lf = %.2lf(x - %.2lf)\n", dosPuntos[0].y, m, dosPuntos[0].x);
-    printf("\tForma pendiente-intersección: y = %.2lfx + %.2lf\n", A, C);
-
-    printf("\n\n\tIngrese el punto del cual desea conocer su distancia a la recta encontrada\n");
-    for (int i = 0; i < 1; i++)
-    {
-        printf("\n\tPunto: %d\n\tIngrese un numero para x: ", i);
-
-        if (fgets(buffer, 256, stdin) == NULL)
-        {
-            printf("Error de lectura.\n");
-            return 1;
-        }
-
-        buffer[strcspn(buffer, "\n")] = '\0';
-
-        errno = 0;
-        puntoCalcularDistancia[i].x = strtod(buffer, &endptr);
-
-        if ((errno == ERANGE && (puntoCalcularDistancia[i].x == 0 || puntoCalcularDistancia[i].x == 256)))
-        {
-            printf("Error: Numero fuera del rango de long.\n");
-        }
-        else if (endptr == buffer)
-        {
-            printf("Error: No se encontro ningun numero valido al inicio de la cadena.\n");
-        }
-
-        //------------------------------------------
-        printf("\tIngrese un numero para y: ");
-
-        if (fgets(buffer, 256, stdin) == NULL)
-        {
-            printf("Error de lectura.\n");
-            return 1;
-        }
-
-        buffer[strcspn(buffer, "\n")] = '\0';
-
-        errno = 0;
-        puntoCalcularDistancia[i].y = strtod(buffer, &endptr);
-
-        if ((errno == ERANGE && (puntoCalcularDistancia[i].y == 0 || puntoCalcularDistancia[i].y == 256)))
-        {
-            printf("Error: Numero fuera del rango de long.\n");
-        }
-        else if (endptr == buffer)
-        {
-            printf("Error: No se encontro ningun numero valido al inicio de la cadena.\n");
-        }
-
-        printf("\t(%lf, %lf)\n\n", puntoCalcularDistancia[i].x, puntoCalcularDistancia[i].y);
-    }
-
-    double distanciaPuntoARecta = puntoRectaDistancia2(A, C, puntoCalcularDistancia);
-    printf("\n\tLa Distancia del punto (%lf, %lf) a la recta y = %.2lfx + %.2lf es: %lf\n", puntoCalcularDistancia[0].x, puntoCalcularDistancia[0].y, A, C, distanciaPuntoARecta);
-    //---------------------------------------------------------------------------------
-    free(arrPorPuntos);
-    free(arrPorPuntosMin);
 }
